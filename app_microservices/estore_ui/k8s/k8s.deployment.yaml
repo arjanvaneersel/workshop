@@ -1,0 +1,21 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: estoreui
+  labels:
+    app: estoreui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: estoreui
+  template:
+    metadata:
+      labels:
+        app: app: estoreui
+    spec:
+      containers:
+      - name: app: estoreui
+        image: <!--image-->
+        ports:
+        - containerPort: 80

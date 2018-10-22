@@ -1,0 +1,26 @@
+{
+  "name": "@etherisc/dip-platform",
+  "description": "Etherisc Decentralized Insurance Platform",
+  "engines": {
+    "node": ">=9.10.0 <10",
+    "npm": ">5.0.0"
+  },
+  "scripts": {
+    "bootstrap": "echo 'Install dependencies for packages'; lerna bootstrap --hoist",
+    "migrate": "echo 'Run database migrations for packages'; lerna run migrate --concurrency 1",
+    "dev": "echo 'Start packages in development mode'; lerna run dev --parallel",
+    "dev:services:run": "echo 'Run dockerized services'; docker-compose -f ./services/compose/docker-compose.yml up -d",
+    "dev:services:kill": "echo 'Kill dockerized services'; docker-compose -f ./services/compose/docker-compose.yml kill",
+    "dev:services:purge": "docker-compose -f ./services/compose/docker-compose.yml down -v; rm -rf ./services/compose/minio; rm -rf ./services/compose/postgresql; rm -rf ./services/compose/ganache",
+    "lint": "echo 'Lint javascript files'; eslint --ext js ."
+  },
+  "devDependencies": {
+    "babel-eslint": "^9.0.0",
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "lerna": "^3.4.0"
+  }
+}
