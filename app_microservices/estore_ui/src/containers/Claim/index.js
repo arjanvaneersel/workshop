@@ -82,7 +82,7 @@ class Claim extends Component {
       .catch(console.error);
   };
 
-  newClaim = () => this.setState({ result: false });
+  newClaim = () => this.setState({ result: false, form: { policyId: '', reason: '' } });
 
   render() {
     const { form, loading, result } = this.state;
