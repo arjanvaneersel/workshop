@@ -240,10 +240,10 @@ class Dashboard extends Component {
     const claims = this.state.claims.map((claim, i) => (
       <Item key={i}>
         <div>
-          <b>Claim Id: {claim.claimId}
+          <b>Claim ID: {claim.claimId}
           </b>
         </div>
-        <div>Policy Id: {claim.policyId}
+        <div>Policy ID: {claim.policyId}
         </div>
         <div>State: {CLAIM_STATE[claim.state].label}
         </div>
