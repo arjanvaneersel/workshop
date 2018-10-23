@@ -259,9 +259,7 @@ class EStoreInsurance {
 
     const policies = [];
 
-    const t = total < 2 ? total : 2;
-
-    for (let i = 0; i < t; i++) {
+    for (let i = 0; i < total; i++) {
       const policy = await this.contract.methods.policies(i).call();
       const risk = await this.contract.methods.risks(policy.riskId).call();
       policies.push({policyId: i, ...policy, ...risk});
@@ -277,9 +275,7 @@ class EStoreInsurance {
 
     const claims = [];
 
-    const t = total < 2 ? total : 2;
-
-    for (let i = 0; i < t; i++) {
+    for (let i = 0; i < total; i++) {
       const claim = await this.contract.methods.claims(i).call();
       claims.push({claimId: i, ...claim});
     }
