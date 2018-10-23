@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Spinner } from 'evergreen-ui';
 import ConfirmationDialog from 'components/ConfirmationDialog';
 import moment from 'moment';
 import numeral from 'numeral';
+import { POLICY_STATE, CLAIM_STATE } from './config';
 
 
 /**
@@ -22,75 +24,6 @@ function hex2a(hexx) {
 
   return str;
 }
-
-const POLICY_STATE = {
-  0: {
-    label: 'Applied',
-    actions: [
-      {
-        method: 'decline', label: 'Decline', intent: 'danger', withDetails: true,
-      },
-      {
-        method: 'underwrite', label: 'Underwrite', intent: 'success',
-      },
-    ],
-  },
-  1: {
-    label: 'Accepted',
-    actions: [
-      {
-        method: 'expire', label: 'Expire', intent: 'warning',
-      },
-    ],
-  },
-  2: {
-    label: 'ForPayout',
-    actions: [
-      {
-        method: 'confirmPayout', label: 'Confirm payout', intent: 'success', withDetails: true,
-      },
-    ],
-  },
-  3: {
-    label: 'PaidOut',
-    actions: [],
-  },
-  4: {
-    label: 'Expired',
-    actions: [],
-  },
-  5: {
-    label: 'Declined', actions: [],
-  },
-};
-
-const CLAIM_STATE = {
-  0: {
-    label: 'Applied',
-    actions: [
-      {
-        method: 'rejectClaim', label: 'Reject', intent: 'danger', withDetails: true,
-      },
-      {
-        method: 'confirmClaim', label: 'Confirm', intent: 'warning', withDetails: true,
-      },
-    ],
-  },
-  1: {
-    label: 'Rejected',
-    actions: [],
-  },
-  2: {
-    label: 'Confirmed',
-    actions: [],
-  },
-};
-
-const POLICY_CURRENCY = {
-  0: 'EUR',
-  1: 'USD',
-  2: 'GBP',
-};
 
 const Article = styled.div`
   height: 100%;
@@ -142,6 +75,9 @@ const SpinnerWrapper = styled.div`
   padding: 30px;
 `;
 
+/**
+ * Dashboard page
+ */
 class Dashboard extends Component {
   state = {
     policies: [],
@@ -150,39 +86,27 @@ class Dashboard extends Component {
     loadingClaims: true,
   };
 
+  static propTypes = {
+    request: PropTypes.func.isRequired,
+  };
+
+  /**
+   * On component mounted livecycle hook
+   */
   componentDidMount() {
     this.loadPolicies();
     this.loadClaims();
   }
 
-  loadPolicies() {
-    const { request } = this.props;
-
-    if (window.socket && window.socket.isOpened) {
-      request('getPolicies')
-        .then(data => this.setState({ policies: data.policies, loadingPolicies: false }))
-        .catch(console.error);
-    } else {
-      setTimeout(() => this.loadPolicies(), 100);
-    }
-  }
-
-  loadClaims() {
-    const { request } = this.props;
-    if (window.socket && window.socket.isOpened) {
-      request('getClaims')
-        .then(data => this.setState({ claims: data.claims, loadingClaims: false }))
-        .catch(console.error);
-    } else {
-      setTimeout(() => this.loadClaims(), 100);
-    }
-  }
-
+  /**
+   * Update policies and claims lists after transaction
+   * @param {{}} data
+   */
   updateAfterTransaction = (data) => {
     const { claims, policies } = this.state;
 
     if (data.policy) {
-      const index = policies.findIndex(policy => policy.policyId === data.policy.policyId);
+      const index = policies.findIndex(policy => Number(policy.policyId) === Number(data.policy.policyId));
 
       const list = [
         ...policies.slice(0, index),
@@ -194,7 +118,7 @@ class Dashboard extends Component {
     }
 
     if (data.claim) {
-      const index = claims.findIndex(claim => claim.claimId === data.claim.claimId);
+      const index = claims.findIndex(claim => Number(claim.claimId) === Number(data.claim.claimId));
 
       const list = [
         ...claims.slice(0, index),
@@ -206,8 +130,43 @@ class Dashboard extends Component {
     }
   };
 
+  /**
+   * Load the list of all policies
+   */
+  loadPolicies = () => {
+    const { request } = this.props;
+
+    if (window.socket && window.socket.isOpened) {
+      request('getPolicies')
+        .then(data => this.setState({ policies: data.policies, loadingPolicies: false }))
+        .catch(console.error);
+    } else {
+      setTimeout(() => this.loadPolicies(), 100);
+    }
+  }
+
+  /**
+   * Load the list of all claims
+   */
+  loadClaims = () => {
+    const { request } = this.props;
+    if (window.socket && window.socket.isOpened) {
+      request('getClaims')
+        .then(data => this.setState({ claims: data.claims, loadingClaims: false }))
+        .catch(console.error);
+    } else {
+      setTimeout(() => this.loadClaims(), 100);
+    }
+  }
+
+  /**
+   * Render component
+   * @return {*}
+   */
   render() {
-    const { policies, claims } = this.state;
+    const {
+      policies, claims, loadingPolicies, loadingClaims,
+    } = this.state;
     const { request } = this.props;
 
     const policiesList = policies.map(policy => (
@@ -226,9 +185,9 @@ class Dashboard extends Component {
 
         {POLICY_STATE[policy.state].actions.length > 0 && (
           <Actions>
-            {POLICY_STATE[policy.state].actions.map((action, i) => (
+            {POLICY_STATE[policy.state].actions.map(action => (
               <ConfirmationDialog
-                key={i}
+                key={action.id}
                 action={action.method}
                 label={action.label}
                 intent={action.intent || 'success'}
@@ -243,8 +202,8 @@ class Dashboard extends Component {
       </Item>
     ));
 
-    const claimsList = claims.map((claim, i) => (
-      <Item key={i}>
+    const claimsList = claims.map(claim => (
+      <Item key={claim.claimId}>
         <div>
           <b>Claim ID: {claim.claimId}
           </b>
@@ -260,9 +219,9 @@ class Dashboard extends Component {
 
         {CLAIM_STATE[claim.state].actions.length > 0 && (
           <Actions>
-            {CLAIM_STATE[claim.state].actions.map((action, i) => (
+            {CLAIM_STATE[claim.state].actions.map(action => (
               <ConfirmationDialog
-                key={i}
+                key={action.id}
                 action={action.method}
                 label={action.label}
                 intent={action.intent || 'success'}
@@ -287,16 +246,16 @@ class Dashboard extends Component {
           <Title>Policies</Title>
 
           <List>
-            {this.state.loadingPolicies && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
-            {!this.state.loadingPolicies && policiesList}
+            {loadingPolicies && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
+            {!loadingPolicies && policiesList}
           </List>
         </Column>
 
         <Column>
           <Title>Claims</Title>
           <List>
-            {this.state.loadingClaims && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
-            {!this.state.loadingPolicies && claimsList}
+            {loadingClaims && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
+            {!loadingPolicies && claimsList}
           </List>
         </Column>
       </Article>

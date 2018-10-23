@@ -15,7 +15,7 @@ class ConfirmationDialog extends Component {
   };
 
   static propTypes = {
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     action: PropTypes.string.isRequired,
     request: PropTypes.func.isRequired,
     updateAfterTransaction: PropTypes.func.isRequired,

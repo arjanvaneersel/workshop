@@ -45,8 +45,8 @@ const Console = ({ logs }) => (
     <Title>Console</Title>
 
     <List>
-      {logs.map((log, i) => (
-        <Message key={i}>
+      {logs.map(log => (
+        <Message key={Math.random()}>
           {log}
         </Message>
       ))}
@@ -55,6 +55,7 @@ const Console = ({ logs }) => (
 );
 
 Console.propTypes = {
+  logs: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default Console;

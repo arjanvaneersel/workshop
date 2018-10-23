@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { CardElement, injectStripe } from 'react-stripe-elements';
 import { Button, TextInputField } from 'evergreen-ui';
 import styled from 'styled-components';
@@ -10,6 +11,9 @@ const CardDetails = styled.div`
   margin-bottom: 20px;
 `;
 
+/**
+ * Checkout form with card charging
+ */
 @injectStripe
 class CardForm extends Component {
   state = {
@@ -19,6 +23,11 @@ class CardForm extends Component {
       email: '',
       token: '',
     },
+  };
+
+  static propTypes = {
+    stripe: PropTypes.shape().isRequired,
+    handleSubmit: PropTypes.func.isRequired,
   };
 
   /**
@@ -32,21 +41,32 @@ class CardForm extends Component {
     this.setState({ form: { ...form, [field]: event.target.value } });
   };
 
+  /**
+   * Submit form
+   * @param {Event} e
+   */
   submit = (e) => {
     e.preventDefault();
 
-    this.props.stripe.createToken()
+    const { form } = this.state;
+    const { stripe, handleSubmit } = this.props;
+
+    stripe.createToken()
       .then((payload) => {
         if (payload.error) {
-          console.log(payload.error);
+          console.error(payload.error);
         } else {
           const token = payload.token.id;
 
-          this.props.handleSubmit({ ...this.state.form, token });
+          handleSubmit({ ...form, token });
         }
       });
   };
 
+  /**
+   * Render component
+   * @return {*}
+   */
   render() {
     const { form } = this.state;
     const {

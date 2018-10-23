@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Spinner } from 'evergreen-ui';
@@ -59,13 +60,18 @@ class Checkout extends Component {
       { label: '3 year', price: 20 },
     ],
     product: products.find((p) => {
-      const { vendorCode } = this.props.match.params;
+      const { match: { params: { vendorCode } } } = this.props;
       return p.vendorCode === vendorCode;
     }),
 
     loading: false,
 
     purchase: null,
+  };
+
+  static propTypes = {
+    request: PropTypes.func.isRequired,
+    match: PropTypes.shape().isRequired,
   };
 
   /**
@@ -154,8 +160,8 @@ class Checkout extends Component {
     } = this.state;
 
     const options = insuranceOptions.map((option, i) => (
-      <Option key={option.label}>
-        <label>
+      <Option key={option.label} name={option.label}>
+        <label htmlFor={option.label}>
           <input
             type="radio"
             name="insurance"
@@ -226,7 +232,11 @@ class Checkout extends Component {
           <div>
             <p><b>Policy:</b></p>
             <p>Id: {purchase.policy.id}</p>
-            <p><a href={`https://kovan.etherscan.io/tx/${purchase.policy.transactionHash}`} target="_blank">Transaction</a></p>
+            <p>
+              <a href={`https://kovan.etherscan.io/tx/${purchase.policy.transactionHash}`} target="_blank" rel="noopener noreferrer">
+                Transaction
+              </a>
+            </p>
           </div>
           )}
         </div>

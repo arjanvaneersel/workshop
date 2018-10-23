@@ -20,6 +20,7 @@ const LoadingWrapper = styled.div`
 
 /**
  * Claim request page
+ * @return {*}
  */
 class Claim extends Component {
   state = {
@@ -97,7 +98,6 @@ class Claim extends Component {
     const { form, loading, result } = this.state;
     const { policyId, reason } = form;
 
-
     return (
       <Article>
         <Helmet>
@@ -136,7 +136,8 @@ class Claim extends Component {
         {!loading && result && !result.error && (
           <div>
             <h3>
-              Claim with ID={result.claim.claimId} for policy with ID={result.claim.policyId} has been successfully created.
+              Claim with ID={result.claim.claimId}&nbsp;
+              for policy with ID={result.claim.policyId} has been successfully created.
             </h3>
             <Button appearance="primary" intent="success" onClick={this.newClaim}>Add new claim</Button>
           </div>
