@@ -69,7 +69,7 @@ class Checkout extends Component {
 
     const total = price * (1 + insuranceOptions[insurance].price / 100);
 
-    return total.toFixed(2);
+    return numeral(total).format('0,0.00');
   }
 
   setInsurance = insurance => () => this.setState({ insurance });
@@ -142,7 +142,7 @@ class Checkout extends Component {
             checked={insurance === i}
             onChange={this.setInsurance(i)}
           />
-          <span>{option.label}</span>
+          <span>{option.label} {option.price !== 0 && <>(+ {numeral(product.price * option.price / 100).format('0,0.00')} {product.currency})</>}</span>
         </label>
       </Option>
     ));
@@ -176,14 +176,14 @@ class Checkout extends Component {
           <CheckoutForm>
             <h3>Checkout</h3>
 
-            <p>Additional insurance:</p>
+            <p>Additional insurance premium:</p>
 
             {options}
 
             <h4>
               Total:
               {' '}
-              {numeral(this.getTotal(product.price)).format('0,0.00')}
+              {this.getTotal(product.price)}
               {' '}
               {product.currency}
             </h4>
