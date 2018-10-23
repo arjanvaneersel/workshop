@@ -36,7 +36,7 @@ class ConfirmationDialog extends Component {
       .then(({ data }) => {
         if (data.error) {
           this.setState({ isShown: false });
-          toaster.danger(data.error);
+          toaster.danger(`An error has occurred: ${data.error}`);
         } else {
           this.setState({ isShown: false });
           updateAfterTransaction(data);
