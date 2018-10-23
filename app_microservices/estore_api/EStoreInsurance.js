@@ -167,19 +167,25 @@ class EStoreInsurance {
   async expire(client, message) {
     this.log.info('expire', message);
 
-    await this.contract.methods.expire(
-      message.data.id,
-    ).send();
+    try {
+      await this.contract.methods.expire(
+        message.data.id,
+      ).send();
 
-    const policy = await this.contract.methods.policies(message.data.id).call();
-    const risk = await this.contract.methods.risks(policy.riskId).call();
+      const policy = await this.contract.methods.policies(message.data.id).call();
+      const risk = await this.contract.methods.risks(policy.riskId).call();
 
-    this.gi.sendWs(client, {
-      id: message.id,
-      data: {
-        policy: { policyId: message.data.id, ...policy, ...risk },
-      },
-    });
+      this.gi.sendWs(client, {
+        id: message.id,
+        data: {
+          policy: { policyId: message.data.id, ...policy, ...risk },
+        },
+      });
+    } catch (e) {
+      console.error(e);
+
+      this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+    }
   }
 
   async rejectClaim(client, message) {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Pane, Dialog, Button, TextInput,
+  Pane, Dialog, Button, TextInput, toaster,
 } from 'evergreen-ui';
 
 /**
@@ -34,10 +34,18 @@ class ConfirmationDialog extends Component {
 
     request(action, { id, details })
       .then(({ data }) => {
-        this.setState({ isShown: false });
-        updateAfterTransaction(data);
+        if (data.error) {
+          this.setState({ isShown: false });
+          toaster.danger(data.error);
+        } else {
+          this.setState({ isShown: false });
+          updateAfterTransaction(data);
+        }
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error(err);
+        this.setState({ isShown: false });
+      });
   };
 
   /**
