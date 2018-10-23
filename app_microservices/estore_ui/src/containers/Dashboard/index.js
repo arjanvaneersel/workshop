@@ -229,8 +229,8 @@ class Dashboard extends Component {
 
     const claims = this.state.claims.map((claim, i) => (
       <Item key={i}>
-        <div><b>Policy Id: {claim.policyId}</b></div>
-        <div><b>Policy Id: {claim.claimId}</b></div>
+        <div><b>Claim Id: {claim.claimId}</b></div>
+        <div>Policy Id: {claim.policyId}</div>
         <div>State: {CLAIM_STATE[claim.state].label}</div>
         <div>State message: {hex2a(claim.stateMessage)}</div>
         <div>Last update: {moment.unix(claim.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}</div>
