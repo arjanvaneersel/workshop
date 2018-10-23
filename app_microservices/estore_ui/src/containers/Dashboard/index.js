@@ -156,55 +156,61 @@ class Dashboard extends Component {
   }
 
   loadPolicies() {
+    const { request } = this.props;
+
     if (window.socket && window.socket.isOpened) {
-      this.props.request('getPolicies')
+      request('getPolicies')
         .then(data => this.setState({ policies: data.policies, loadingPolicies: false }))
         .catch(console.error);
     } else {
-      console.log('wait');
       setTimeout(() => this.loadPolicies(), 100);
     }
   }
 
   loadClaims() {
+    const { request } = this.props;
     if (window.socket && window.socket.isOpened) {
-      this.props.request('getClaims')
+      request('getClaims')
         .then(data => this.setState({ claims: data.claims, loadingClaims: false }))
         .catch(console.error);
     } else {
-      console.log('wait');
       setTimeout(() => this.loadClaims(), 100);
     }
   }
 
   updateAfterTransaction = (data) => {
-    if (data.policy) {
-      const index = this.state.policies.findIndex(policy => policy.policyId === data.policy.policyId);
+    const { claims, policies } = this.state;
 
-      const policies = [
-        ...this.state.policies.slice(0, index),
+    if (data.policy) {
+      const index = policies.findIndex(policy => policy.policyId === data.policy.policyId);
+
+      const list = [
+        ...policies.slice(0, index),
         data.policy,
-        ...this.state.policies.slice(index + 1),
+        ...policies.slice(index + 1),
       ];
 
-      this.setState({ policies: [...policies] });
+      this.setState({ policies: [...list] });
     }
 
     if (data.claim) {
-      const index = this.state.claims.findIndex(claim => claim.claimId === data.claim.claimId);
+      const index = claims.findIndex(claim => claim.claimId === data.claim.claimId);
 
-      const claims = [
-        ...this.state.claims.slice(0, index),
+      const list = [
+        ...claims.slice(0, index),
         data.claim,
-        ...this.state.claims.slice(index + 1),
+        ...claims.slice(index + 1),
       ];
 
-      this.setState({ claims: [...claims] });
+      this.setState({ claims: [...list] });
     }
   };
 
   render() {
-    const policies = this.state.policies.map(policy => (
+    const { policies, claims } = this.state;
+    const { request } = this.props;
+
+    const policiesList = policies.map(policy => (
       <Item key={policy.policyId}>
         <div><b>{hex2a(policy.product)}</b></div>
         <div>Policy ID: {policy.policyId}
@@ -226,7 +232,7 @@ class Dashboard extends Component {
                 action={action.method}
                 label={action.label}
                 intent={action.intent || 'success'}
-                request={this.props.request}
+                request={request}
                 withDetails={action.withDetails || false}
                 id={policy.policyId}
                 updateAfterTransaction={this.updateAfterTransaction}
@@ -237,7 +243,7 @@ class Dashboard extends Component {
       </Item>
     ));
 
-    const claims = this.state.claims.map((claim, i) => (
+    const claimsList = claims.map((claim, i) => (
       <Item key={i}>
         <div>
           <b>Claim ID: {claim.claimId}
@@ -260,7 +266,7 @@ class Dashboard extends Component {
                 action={action.method}
                 label={action.label}
                 intent={action.intent || 'success'}
-                request={this.props.request}
+                request={request}
                 withDetails={action.withDetails || false}
                 id={claim.claimId}
                 updateAfterTransaction={this.updateAfterTransaction}
@@ -282,7 +288,7 @@ class Dashboard extends Component {
 
           <List>
             {this.state.loadingPolicies && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
-            {!this.state.loadingPolicies && policies}
+            {!this.state.loadingPolicies && policiesList}
           </List>
         </Column>
 
@@ -290,7 +296,7 @@ class Dashboard extends Component {
           <Title>Claims</Title>
           <List>
             {this.state.loadingClaims && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
-            {!this.state.loadingPolicies && claims}
+            {!this.state.loadingPolicies && claimsList}
           </List>
         </Column>
       </Article>

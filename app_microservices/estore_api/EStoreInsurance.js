@@ -26,7 +26,15 @@ const provider = new HDWalletProvider(MNEMONIC, HTTP_PROVIDER);
 web3.setProvider(provider);
 
 
+/**
+ * EStore insurance API
+ */
 class EStoreInsurance {
+  /**
+   * Constructor
+   * @param {GenericInsurance} genericInsurance
+   * @param {Logger} log
+   */
   constructor({ genericInsurance, log }) {
     this.gi = genericInsurance;
     this.log = log;
@@ -45,6 +53,11 @@ class EStoreInsurance {
     });
   }
 
+  /**
+   * Handle message form websocket
+   * @param {string} client
+   * @param {string} payload
+   */
   onWsMessage(client, payload) {
     const message = JSON.parse(payload);
     const { id, type, data } = message;
@@ -62,6 +75,10 @@ class EStoreInsurance {
     handler(client, { id, data });
   }
 
+  /**
+   * Handle event from contract
+   * @param {Event} event
+   */
   onContractEvent(event) {
     const { name } = event;
 
@@ -75,14 +92,28 @@ class EStoreInsurance {
     handler(event);
   }
 
+  /**
+   * Handle LogPolicySetState event
+   * @param {Event} event
+   */
   onLogPolicySetState(event) {
     this.log.info('onLogPolicySetState', event);
   }
 
+
+  /**
+   * Handle LogClaimSetState event
+   * @param {Event} event
+   */
   onLogClaimSetState(event) {
     this.log.info('onLogClaimSetState', event);
   }
 
+  /**
+   * Send newPolicy transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   newPolicy(client, message) {
     this.log.info('newPolicy', message);
 
@@ -99,10 +130,13 @@ class EStoreInsurance {
       .then((data) => {
         this.gi.sendWs(client, { id: message.id, data });
       });
-
-    // cronjob
   }
 
+  /**
+   * Send underwrite transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   async underwrite(client, message) {
     this.log.info('underwrite', message);
 
@@ -121,6 +155,11 @@ class EStoreInsurance {
     });
   }
 
+  /**
+   * Send decline transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   async decline(client, message) {
     this.log.info('decline', message);
 
@@ -140,6 +179,11 @@ class EStoreInsurance {
     });
   }
 
+  /**
+   * Send newClaim transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   newClaim(client, message) {
     this.log.info('newClaim', message);
 
@@ -164,6 +208,11 @@ class EStoreInsurance {
     }
   }
 
+  /**
+   * Send expire transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   async expire(client, message) {
     this.log.info('expire', message);
 
@@ -188,6 +237,11 @@ class EStoreInsurance {
     }
   }
 
+  /**
+   * Send rejectClaim transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   async rejectClaim(client, message) {
     this.log.info('rejectClaim', message);
 
@@ -218,6 +272,11 @@ class EStoreInsurance {
     }
   }
 
+  /**
+   * Send confirmClaim transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   async confirmClaim(client, message) {
     this.log.info('confirmClaim', message);
 
@@ -239,6 +298,11 @@ class EStoreInsurance {
     });
   }
 
+  /**
+   * Send confirmPayout transaction
+   * @param {string} client
+   * @param {{}} message
+   */
   async confirmPayout(client, message) {
     this.log.info('confirmPayout', message);
 
@@ -258,6 +322,11 @@ class EStoreInsurance {
     });
   }
 
+  /**
+   * Request list of policies
+   * @param {string} client
+   * @param {{}} message
+   */
   async getPolicies(client, message) {
     this.log.info('get policies count', message);
 
@@ -265,7 +334,7 @@ class EStoreInsurance {
 
     const policies = [];
 
-    for (let i = 0; i < total; i++) {
+    for (let i = 0; i < total; i += 1) {
       const policy = await this.contract.methods.policies(i).call();
       const risk = await this.contract.methods.risks(policy.riskId).call();
       policies.push({ policyId: i, ...policy, ...risk });
@@ -275,7 +344,7 @@ class EStoreInsurance {
   }
 
   /**
-   * Request all claims
+   * Request list of claims
    * @param {string} client
    * @param {{}} message
    * @return {Promise<void>}

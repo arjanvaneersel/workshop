@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { TextInputField, Button, Spinner } from 'evergreen-ui';
@@ -28,6 +29,10 @@ class Claim extends Component {
     },
     loading: false,
     result: false,
+  };
+
+  static propTypes = {
+    request: PropTypes.func.isRequired,
   };
 
   /**
@@ -84,6 +89,10 @@ class Claim extends Component {
 
   newClaim = () => this.setState({ result: false, form: { policyId: '', reason: '' } });
 
+  /**
+   * Render component
+   * @return {*}
+   */
   render() {
     const { form, loading, result } = this.state;
     const { policyId, reason } = form;
@@ -127,8 +136,7 @@ class Claim extends Component {
         {!loading && result && !result.error && (
           <div>
             <h3>
-              Claim with ID={result.claim.claimId}
-              for policy with ID={result.claim.policyId} has been successfully created.
+              Claim with ID={result.claim.claimId} for policy with ID={result.claim.policyId} has been successfully created.
             </h3>
             <Button appearance="primary" intent="success" onClick={this.newClaim}>Add new claim</Button>
           </div>
