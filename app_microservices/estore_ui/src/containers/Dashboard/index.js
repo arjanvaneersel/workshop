@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Helmet} from 'react-helmet';
 import styled from 'styled-components';
-import {Spinner} from 'evergreen-ui';
-import {Button} from 'evergreen-ui';
+import { Spinner } from 'evergreen-ui';
 import ConfirmationDialog from 'components/ConfirmationDialog';
 import moment from 'moment';
+import numeral from 'numeral';
 
 
 function hex2a(hexx) {
@@ -19,27 +19,72 @@ function hex2a(hexx) {
 }
 
 const POLICY_STATE = {
-  '0': {label: 'Applied', actions: [{method: 'decline', intent: 'danger', withDetails: true}, {method: 'underwrite', intent: 'success'}]},
-  '1': {label: 'Accepted', actions: [{method: 'expire', intent: 'warning'}]},
-  '2': {label: 'ForPayout', actions: [{method: 'confirmPayout', intent: 'success', withDetails: true}]},
-  '3': {label: 'PaidOut', actions: []},
-  '4': {label: 'Expired', actions: []},
-  '5': {label: 'Declined', actions: []},
+  0: {
+    label: 'Applied',
+    actions: [
+      {
+        method: 'decline', label: 'Decline', intent: 'danger', withDetails: true,
+      },
+      {
+        method: 'underwrite', label: 'Underwrite', intent: 'success',
+      },
+    ],
+  },
+  1: {
+    label: 'Accepted',
+    actions: [
+      {
+        method: 'expire', label: 'Expire', intent: 'warning',
+      },
+    ],
+  },
+  2: {
+    label: 'ForPayout',
+    actions: [
+      {
+        method: 'confirmPayout', label: 'Confirm payout', intent: 'success', withDetails: true,
+      },
+    ],
+  },
+  3: {
+    label: 'PaidOut',
+    actions: [],
+  },
+  4: {
+    label: 'Expired',
+    actions: [],
+  },
+  5: {
+    label: 'Declined', actions: [],
+  },
 };
 
 const CLAIM_STATE = {
-  '0': {
+  0: {
     label: 'Applied',
-    actions: [{method: 'rejectClaim', intent: 'danger', withDetails: true}, {method: 'confirmClaim', intent: 'warning', withDetails: true}]
+    actions: [
+      {
+        method: 'rejectClaim', label: 'Reject', intent: 'danger', withDetails: true,
+      },
+      {
+        method: 'confirmClaim', label: 'Confirm', intent: 'warning', withDetails: true,
+      },
+    ],
   },
-  '1': {label: 'Rejected', actions: []},
-  '2': {label: 'Confirmed', actions: []},
+  1: {
+    label: 'Rejected',
+    actions: [],
+  },
+  2: {
+    label: 'Confirmed',
+    actions: [],
+  },
 };
 
 const POLICY_CURRENCY = {
-  '0': 'EUR',
-  '1': 'USD',
-  '2': 'GBP',
+  0: 'EUR',
+  1: 'USD',
+  2: 'GBP',
 };
 
 const Article = styled.div`
@@ -161,7 +206,7 @@ class Dashboard extends Component {
         <div>State: {POLICY_STATE[policy.state].label}</div>
         <div>State message: {hex2a(policy.stateMessage)}</div>
         <div>Last update: {moment.unix(policy.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}</div>
-        <div>Premium: {policy.premium}</div>
+        <div>Premium: {numeral(policy.premium / 100).format('0,0.00')}</div>
 
         {POLICY_STATE[policy.state].actions.length > 0 && (
           <Actions>
@@ -169,6 +214,7 @@ class Dashboard extends Component {
               <ConfirmationDialog
                 key={i}
                 action={action.method}
+                label={action.label}
                 intent={action.intent}
                 request={this.props.request}
                 withDetails={action.withDetails}
@@ -195,6 +241,7 @@ class Dashboard extends Component {
               <ConfirmationDialog
                 key={i}
                 action={action.method}
+                label={action.label}
                 intent={action.intent}
                 request={this.props.request}
                 withDetails={action.withDetails}

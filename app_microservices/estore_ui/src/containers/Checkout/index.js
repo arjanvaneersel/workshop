@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Spinner } from 'evergreen-ui';
 import { StripeProvider, Elements } from 'react-stripe-elements';
 import products from 'products.json';
+import numeral from 'numeral';
 import CardForm from './form';
 
 
@@ -163,7 +164,7 @@ class Checkout extends Component {
               <b>
                 Price:
                 {' '}
-                {product.price}
+                {numeral(product.price).format('0,0.00')}
                 {' '}
                 {product.currency}
               </b>
@@ -182,7 +183,7 @@ class Checkout extends Component {
             <h4>
               Total:
               {' '}
-              {this.getTotal(product.price)}
+              {numeral(this.getTotal(product.price)).format('0,0.00')}
               {' '}
               {product.currency}
             </h4>

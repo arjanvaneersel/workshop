@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Pane, Dialog, Button, TextInput } from 'evergreen-ui';
+import {
+  Pane, Dialog, Button, TextInput,
+} from 'evergreen-ui';
 
 
 class ConfirmationDialog extends Component {
@@ -32,17 +34,21 @@ class ConfirmationDialog extends Component {
           onCloseComplete={() => this.setState({isShown: false, isLoading: false})}
           isConfirmLoading={this.state.isLoading}
           onConfirm={this.confirm}
-          confirmLabel={this.state.isLoading ? 'Loading...' : 'Send transaction'}
+          confirmLabel={this.state.isLoading ? 'Loading...' : this.props.label}
         >
-          <p>Think twice before you confirm transaction</p>
+          <p>Are you sure you want to confirm this transaction?</p>
 
           {this.props.withDetails && (
-            <TextInput
-              placeholder="Specify details"
-              width="100%"
-              onChange={e => this.setState({ details: e.target.value })}
-              value={this.state.details}
-            />
+            <div>
+              <p>If so, please specify the details:</p>
+              <TextInput
+                placeholder="Details"
+                width="100%"
+                fontSize="14px"
+                onChange={e => this.setState({ details: e.target.value })}
+                value={this.state.details}
+              />
+            </div>
           )}
         </Dialog>
 
@@ -50,9 +56,10 @@ class ConfirmationDialog extends Component {
           onClick={() => this.setState({isShown: true})}
           marginRight={16}
           appearance="primary"
+          height={32}
           intent={this.props.intent}
         >
-          {this.props.action.toUpperCase()}
+          {this.props.label}
         </Button>
       </Pane>
     );

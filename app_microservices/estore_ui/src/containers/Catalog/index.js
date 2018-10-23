@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { darken } from 'polished';
+import numeral from 'numeral';
+
 
 import products from 'products.json';
 
@@ -59,7 +61,7 @@ class Catalog extends Component {
         <div>
           Price:
           {' '}
-          <b>{item.price}</b>
+          <b>{numeral(item.price).format('0,0.00')}</b>
           {' '}
           {item.currency}
         </div>

@@ -9,6 +9,10 @@ const GlobalStyles = createGlobalStyle`
   html, body, #app {
     height: 100%;
   }
+  
+  .📦fnt-sze_12px {
+    font-size: 14px !important;
+  }
 `;
 
 export default GlobalStyles;
