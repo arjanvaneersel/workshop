@@ -5,7 +5,7 @@ const ABI = require('./EStoreInsurance.json');
 
 
 const MNEMONIC = 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treatment';
-const CONTRACT = '0x1f06d20BE650d4745A8D6b270B6A87176A763f72';
+const CONTRACT = '0xe52ccDa47f12FC8119261e38124B6d3b558aD611';
 const ACCOUNT = '0x1b7eeb70b214a41e19fc8ba66fb291b9b097ecaf';
 const HTTP_PROVIDER = 'https://kovan.infura.io/1reQ7FJQ1zs0QGExhlZ8';
 
