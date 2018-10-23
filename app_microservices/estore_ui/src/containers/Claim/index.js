@@ -127,7 +127,7 @@ class Claim extends Component {
         {!loading && result && !result.error && (
           <div>
             <h3>
-              Claim # {result.claim.claimId} for policy #{result.claim.policyId} created
+              Claim with ID={result.claim.claimId} for policy with ID={result.claim.policyId} has been successfully created.
             </h3>
             <Button appearance="primary" intent="success" onClick={this.newClaim}>Add new claim</Button>
           </div>
@@ -135,7 +135,7 @@ class Claim extends Component {
 
         {!loading && result && result.error && (
           <div>
-            <h3>An error has occured: {result.error}</h3>
+            <h3>An error has occurred: {result.error}</h3>
             <Button appearance="primary" intent="success" onClick={this.newClaim}>Add new claim</Button>
           </div>
         )}
