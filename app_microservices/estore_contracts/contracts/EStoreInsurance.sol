@@ -119,10 +119,14 @@ contract EStoreInsurance is Ownable {
     }
 
     function newClaim(uint256 _policyId, string _reason) external onlyOwner {
+        Policy storage policy = policies[_policyId];
+        Risk storage risk = risks[policy.riskId];
+
+        require(policy.state == PolicyState.Accepted);
+        require(block.timestamp <= risk.expiration);
+
         uint256 _claimId = claims.length++;
-
         Claim storage claim = claims[_claimId];
-
         claim.policyId = _policyId;
 
         _setClaimState(_claimId, ClaimState.Applied, _reason);
