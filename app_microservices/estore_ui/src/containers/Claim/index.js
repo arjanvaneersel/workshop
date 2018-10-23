@@ -100,7 +100,7 @@ class Claim extends Component {
           <form onSubmit={this.handleSubmit}>
             <TextInputField
               label="Policy ID"
-              placeholder="Enter ID of policy"
+              placeholder="Enter your policy ID"
               value={policyId}
               onChange={this.handleChange('policyId')}
               required
