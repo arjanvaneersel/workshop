@@ -46,7 +46,9 @@ const Purchase = styled.div`
   padding: 30px;
 `;
 
-
+/**
+ * Checkout page
+ */
 class Checkout extends Component {
   state = {
     insurance: 0,
@@ -56,30 +58,46 @@ class Checkout extends Component {
       { label: '2 year', price: 15 },
       { label: '3 year', price: 20 },
     ],
-    product: products.find(p => p.vendorCode === this.props.match.params.vendorCode),
+    product: products.find((p) => {
+      const { vendorCode } = this.props.match.params;
+      return p.vendorCode === vendorCode;
+    }),
 
     loading: false,
 
     purchase: null,
   };
 
+  /**
+   * Calculate total sum
+   * @param {number} value
+   * @return {number}
+   */
   getTotal(value) {
     const price = Number(value);
     const { insuranceOptions, insurance } = this.state;
 
-    const total = price * (1 + insuranceOptions[insurance].price / 100);
-
-    return numeral(total).format('0,0.00');
+    return price * (1 + insuranceOptions[insurance].price / 100);
   }
 
+  /**
+   * Select insurance option
+   * @param {string} insurance
+   * @return {void}
+   */
   setInsurance = insurance => () => this.setState({ insurance });
 
+  /**
+   * Submit checkout form
+   * @param {{}} data
+   */
   handleSubmit = (data) => {
-    // console.log(data, this.getTotal(this.state.product.price));
+    const { insurance, product, insuranceOptions } = this.state;
+    const { request } = this.props;
 
-    this.setState({loading: true});
+    this.setState({ loading: true });
 
-    if (this.state.insurance) {
+    if (insurance) {
       const input = {
         customer: {
           firstname: data.firstname,
@@ -88,24 +106,23 @@ class Checkout extends Component {
         },
         policy: {
           distributorId: '11111111-1111-1111-1111-111111111111',
-          vendorCode: this.state.product.vendorCode,
-          product: this.state.product.product,
-          premium: this.state.product.price * this.state.insuranceOptions[this.state.insurance].price,
-          sumInsured: this.state.product.price,
-          currency: this.state.product.currency,
-          expiration: this.state.insuranceOptions[this.state.insurance].label,
+          vendorCode: product.vendorCode,
+          product: product.product,
+          premium: product.price * insuranceOptions[insurance].price,
+          sumInsured: product.price,
+          currency: product.currency,
+          expiration: insuranceOptions[insurance].label,
         },
       };
 
-      this.props.request('newPolicy', input)
+      request('newPolicy', input)
         .then((result) => {
-          console.log(result);
           this.setState({
             loading: false,
             purchase: {
               product: {
-                vendorCode: this.state.product.vendorCode,
-                product: this.state.product.product,
+                vendorCode: product.vendorCode,
+                product: product.product,
               },
               policy: {
                 id: result.data.events.LogPolicySetState.returnValues._policyId,
@@ -119,18 +136,22 @@ class Checkout extends Component {
         loading: false,
         purchase: {
           product: {
-            vendorCode: this.state.product.vendorCode,
-            product: this.state.product.product,
+            vendorCode: product.vendorCode,
+            product: product.product,
           },
         },
       });
     }
-
-
   };
 
+  /**
+   * Render component
+   * @return {*}
+   */
   render() {
-    const { insurance, insuranceOptions, product } = this.state;
+    const {
+      insurance, insuranceOptions, product, loading, purchase,
+    } = this.state;
 
     const options = insuranceOptions.map((option, i) => (
       <Option key={option.label}>
@@ -142,7 +163,9 @@ class Checkout extends Component {
             checked={insurance === i}
             onChange={this.setInsurance(i)}
           />
-          <span>{option.label} {option.price !== 0 && <>(+ {numeral(product.price * option.price / 100).format('0,0.00')} {product.currency})</>}</span>
+          <span>
+            {option.label} {option.price !== 0 && <>(+ {numeral(product.price * option.price / 100).format('0,0.00')} {product.currency})</>}
+          </span>
         </label>
       </Option>
     ));
@@ -162,31 +185,21 @@ class Checkout extends Component {
 
             <p>
               <b>
-                Price:
-                {' '}
-                {numeral(product.price).format('0,0.00')}
-                {' '}
-                {product.currency}
+                Price: {numeral(product.price).format('0,0.00')} {product.currency}
               </b>
             </p>
           </Details>
         </Product>
 
-        {!this.state.loading && !this.state.purchase && (
+        {!loading && !purchase && (
           <CheckoutForm>
             <h3>Checkout</h3>
 
-            <p>Additional insurance premium:</p>
+            <p>Additional insurance:</p>
 
             {options}
 
-            <h4>
-              Total:
-              {' '}
-              {this.getTotal(product.price)}
-              {' '}
-              {product.currency}
-            </h4>
+            <h4>Total: {numeral(this.getTotal(product.price)).format('0,0.00')} {product.currency}</h4>
 
             <StripeProvider apiKey="pk_RXwtgk4Z5VR82S94vtwmam6P8qMXQ">
               <Elements>
@@ -197,26 +210,26 @@ class Checkout extends Component {
           </CheckoutForm>
         )}
 
-        {this.state.loading && !this.state.purchase && (
+        {loading && !purchase && (
           <Purchase>
             <Spinner />
           </Purchase>
         )}
 
-        {!this.state.loading && this.state.purchase && (
-            <div style={{textAlign: 'center'}}>
-              <h3>Congratulations!</h3>
-              <p><b>Your purchase:</b></p>
-              <p>Product: {product.product}</p>
+        {!loading && purchase && (
+        <div style={{ textAlign: 'center' }}>
+          <h3>Congratulations!</h3>
+          <p><b>Your purchase:</b></p>
+          <p>Product: {product.product}</p>
 
-              {this.state.purchase.policy && (
-                <div>
-                  <p><b>Policy:</b></p>
-                  <p>Id: {this.state.purchase.policy.id}</p>
-                  <p><a href={`https://kovan.etherscan.io/tx/${this.state.purchase.policy.transactionHash}`} target="_blank">Transaction</a></p>
-                </div>
-              )}
-            </div>
+          {purchase.policy && (
+          <div>
+            <p><b>Policy:</b></p>
+            <p>Id: {purchase.policy.id}</p>
+            <p><a href={`https://kovan.etherscan.io/tx/${purchase.policy.transactionHash}`} target="_blank">Transaction</a></p>
+          </div>
+          )}
+        </div>
         )}
 
       </Article>

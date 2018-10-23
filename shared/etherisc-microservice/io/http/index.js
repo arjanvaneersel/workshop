@@ -25,10 +25,18 @@ class HttpApp extends Koa {
     this._controllers = {};
   }
 
+  /**
+   * Get instance of server
+   * @return {null|*}
+   */
   get server() {
     return this._server;
   }
 
+  /**
+   * Get server port
+   * @return {number}
+   */
   get port() {
     return this._port;
   }

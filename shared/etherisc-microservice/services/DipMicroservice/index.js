@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const _ = require('lodash');
 const { throwError } = require('../../utils');
 
 /**

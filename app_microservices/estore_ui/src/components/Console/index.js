@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 
@@ -33,7 +34,13 @@ const Message = styled.div`
   margin: 10px 10px;
 `;
 
-const Console = ({logs}) => (
+/**
+ * Application console
+ * @param {array} logs
+ * @return {*}
+ * @constructor
+ */
+const Console = ({ logs }) => (
   <Wrapper>
     <Title>Console</Title>
 
@@ -46,5 +53,8 @@ const Console = ({logs}) => (
     </List>
   </Wrapper>
 );
+
+Console.propTypes = {
+};
 
 export default Console;

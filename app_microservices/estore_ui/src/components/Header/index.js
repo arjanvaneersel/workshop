@@ -44,6 +44,11 @@ const Nav = styled.div`
   }
 `;
 
+/**
+ * Application header
+ * @return {*}
+ * @constructor
+ */
 const Header = () => (
   <Wrapper>
     <Logotype>Electronic store</Logotype>

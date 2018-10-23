@@ -1,4 +1,4 @@
-const { bootstrap, isDockerHost } = require('@etherisc/microservice');
+const { bootstrap } = require('@etherisc/microservice');
 const DipPolicyStorage = require('./DipPolicyStorage');
 
 

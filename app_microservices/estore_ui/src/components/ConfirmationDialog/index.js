@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Pane, Dialog, Button, TextInput,
 } from 'evergreen-ui';
 
-
+/**
+ * Transaction confirmation dialog
+ */
 class ConfirmationDialog extends Component {
   state = {
     isShown: false,
@@ -11,34 +14,53 @@ class ConfirmationDialog extends Component {
     details: '',
   };
 
-  confirm = () => {
-    this.setState({isLoading: true});
+  static propTypes = {
+    id: PropTypes.number.isRequired,
+    action: PropTypes.string.isRequired,
+    request: PropTypes.func.isRequired,
+    updateAfterTransaction: PropTypes.func.isRequired,
+    label: PropTypes.string.isRequired,
+    withDetails: PropTypes.bool.isRequired,
+    intent: PropTypes.string.isRequired,
+  };
 
-    this.props.request(this.props.action, {
-      id: this.props.id,
-      details: this.state.details,
-    })
-      .then(({data}) => {
-        this.setState({isShown: false});
-        this.props.updateAfterTransaction(data);
+  confirm = () => {
+    const {
+      action, id, request, updateAfterTransaction,
+    } = this.props;
+    const { details } = this.state;
+
+    this.setState({ isLoading: true });
+
+    request(action, { id, details })
+      .then(({ data }) => {
+        this.setState({ isShown: false });
+        updateAfterTransaction(data);
       })
       .catch(console.error);
-  }
+  };
 
+  /**
+   * Render component
+   * @return {*}
+   */
   render() {
+    const { isShown, isLoading, details } = this.state;
+    const { label, withDetails, intent } = this.props;
+
     return (
       <Pane>
         <Dialog
-          isShown={this.state.isShown}
+          isShown={isShown}
           title="Transaction confirmation"
-          onCloseComplete={() => this.setState({isShown: false, isLoading: false})}
-          isConfirmLoading={this.state.isLoading}
+          onCloseComplete={() => this.setState({ isShown: false, isLoading: false })}
+          isConfirmLoading={isLoading}
           onConfirm={this.confirm}
-          confirmLabel={this.state.isLoading ? 'Loading...' : this.props.label}
+          confirmLabel={isLoading ? 'Loading...' : label}
         >
           <p>Are you sure you want to confirm this transaction?</p>
 
-          {this.props.withDetails && (
+          {withDetails && (
             <div>
               <p>If so, please specify the details:</p>
               <TextInput
@@ -46,20 +68,20 @@ class ConfirmationDialog extends Component {
                 width="100%"
                 fontSize="14px"
                 onChange={e => this.setState({ details: e.target.value })}
-                value={this.state.details}
+                value={details}
               />
             </div>
           )}
         </Dialog>
 
         <Button
-          onClick={() => this.setState({isShown: true})}
+          onClick={() => this.setState({ isShown: true })}
           marginRight={16}
           appearance="primary"
           height={32}
-          intent={this.props.intent}
+          intent={intent}
         >
-          {this.props.label}
+          {label}
         </Button>
       </Pane>
     );

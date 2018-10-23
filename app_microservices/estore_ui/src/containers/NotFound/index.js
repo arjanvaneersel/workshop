@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet';
 
-
-class NotFound extends Component {
-  render() {
-    return (
-      <article>
-        <Helmet>
-          <title>Not found</title>
-        </Helmet>
-        <h1>Page not found</h1>
-      </article>
-    );
-  }
-}
+/**
+ * NotFound page
+ * @return {*}
+ * @constructor
+ */
+const NotFound = () => (
+  <article>
+    <Helmet>
+      <title>Not found</title>
+    </Helmet>
+    <h1>Page not found</h1>
+  </article>
+);
 
 export default NotFound;

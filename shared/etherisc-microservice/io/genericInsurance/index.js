@@ -1,9 +1,20 @@
 const WebSocket = require('ws');
 const uuid = require('uuid/v1');
 
-
+/**
+ * Generic insurance
+ */
 class GenericInsurance {
-  constructor({ amqp, http, appName, appVersion }) {
+  /**
+   * Constructor
+   * @param {{}} amqp
+   * @param {{}} http
+   * @param {{}} appName
+   * @param {{}} appVersion
+   */
+  constructor({
+    amqp, http, appName, appVersion,
+  }) {
     this._amqp = amqp;
     this._http = http;
     this._appName = appName;
@@ -12,12 +23,21 @@ class GenericInsurance {
     this._connections = {};
   }
 
+  /**
+   * Start
+   * @return {Promise<void>}
+   */
   async bootstrap() {
     this._wss = new WebSocket.Server({ server: this._http.server });
 
     this._wss.on('connection', ws => this._register(ws));
   }
 
+  /**
+   * Register new WebSocket connection
+   * @param {{}} connection
+   * @private
+   */
   _register(connection) {
     const connectionId = uuid();
 
@@ -32,6 +52,12 @@ class GenericInsurance {
     connection.on('message', message => this._processWsMessage(connectionId, message));
   }
 
+  /**
+   * Handle WebSocker message
+   * @param {string} connectionId
+   * @param {string} message
+   * @private
+   */
   _processWsMessage(connectionId, message) {
     console.log(connectionId, message);
 
@@ -40,18 +66,22 @@ class GenericInsurance {
     }
   }
 
+  /**
+   * Bind external handler for processing WebSocket messages
+   * @param {function} handler
+   */
   setWsMsgHandler(handler) {
     this._wsMsgHandler = handler;
   }
 
+  /**
+   * Send message to WebSocker connection
+   * @param {string} connectionId
+   * @param {{}} msg
+   */
   sendWs(connectionId, msg) {
     if (!connectionId) return;
     this._connections[connectionId].send(JSON.stringify(msg));
-  }
-
-  watch(contract, abi, events = 'all', handler) {
-    console.log('Watch', contract, abi);
-
   }
 
   /**

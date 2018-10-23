@@ -27,11 +27,15 @@ web3.setProvider(provider);
 
 
 class EStoreInsurance {
-  constructor({ genericInsurance, log, db }) {
+  constructor({ genericInsurance, log }) {
     this.gi = genericInsurance;
     this.log = log;
   }
 
+  /**
+   * On application started livecycle hook
+   * @return {Promise<void>}
+   */
   async bootstrap() {
     this.gi.setWsMsgHandler(this.onWsMessage.bind(this));
 
@@ -39,10 +43,6 @@ class EStoreInsurance {
       gasPrice: 5500000,
       from: ACCOUNT,
     });
-
-    const contract = '0x';
-    const abi = {};
-    this.gi.watch(contract, abi, 'all', this.onContractEvent.bind(this));
   }
 
   onWsMessage(client, payload) {
@@ -262,12 +262,18 @@ class EStoreInsurance {
     for (let i = 0; i < total; i++) {
       const policy = await this.contract.methods.policies(i).call();
       const risk = await this.contract.methods.risks(policy.riskId).call();
-      policies.push({policyId: i, ...policy, ...risk});
+      policies.push({ policyId: i, ...policy, ...risk });
     }
 
     this.gi.sendWs(client, { id: message.id, policies });
   }
 
+  /**
+   * Request all claims
+   * @param {string} client
+   * @param {{}} message
+   * @return {Promise<void>}
+   */
   async getClaims(client, message) {
     this.log.info('get claims count', message);
 
@@ -275,9 +281,9 @@ class EStoreInsurance {
 
     const claims = [];
 
-    for (let i = 0; i < total; i++) {
+    for (let i = 0; i < total; i += 1) {
       const claim = await this.contract.methods.claims(i).call();
-      claims.push({claimId: i, ...claim});
+      claims.push({ claimId: i, ...claim });
     }
 
     this.gi.sendWs(client, { id: message.id, claims });

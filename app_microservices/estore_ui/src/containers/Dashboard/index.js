@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Helmet} from 'react-helmet';
+import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Spinner } from 'evergreen-ui';
 import ConfirmationDialog from 'components/ConfirmationDialog';
@@ -7,6 +7,11 @@ import moment from 'moment';
 import numeral from 'numeral';
 
 
+/**
+ * Decode hex to string
+ * @param {string} hexx
+ * @return {string}
+ */
 function hex2a(hexx) {
   const hex = hexx.toString();
 
@@ -153,7 +158,7 @@ class Dashboard extends Component {
   loadPolicies() {
     if (window.socket && window.socket.isOpened) {
       this.props.request('getPolicies')
-        .then(data => this.setState({policies: data.policies, loadingPolicies: false}))
+        .then(data => this.setState({ policies: data.policies, loadingPolicies: false }))
         .catch(console.error);
     } else {
       console.log('wait');
@@ -164,7 +169,7 @@ class Dashboard extends Component {
   loadClaims() {
     if (window.socket && window.socket.isOpened) {
       this.props.request('getClaims')
-        .then(data => this.setState({claims: data.claims, loadingClaims: false}))
+        .then(data => this.setState({ claims: data.claims, loadingClaims: false }))
         .catch(console.error);
     } else {
       console.log('wait');
@@ -202,11 +207,16 @@ class Dashboard extends Component {
     const policies = this.state.policies.map(policy => (
       <Item key={policy.policyId}>
         <div><b>{hex2a(policy.product)}</b></div>
-        <div>Policy ID: {policy.policyId}</div>
-        <div>State: {POLICY_STATE[policy.state].label}</div>
-        <div>State message: {hex2a(policy.stateMessage)}</div>
-        <div>Last update: {moment.unix(policy.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}</div>
-        <div>Premium: {numeral(policy.premium / 100).format('0,0.00')}</div>
+        <div>Policy ID: {policy.policyId}
+        </div>
+        <div>State: {POLICY_STATE[policy.state].label}
+        </div>
+        <div>State message: {hex2a(policy.stateMessage)}
+        </div>
+        <div>Last update: {moment.unix(policy.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}
+        </div>
+        <div>Premium: {numeral(policy.premium / 100).format('0,0.00')}
+        </div>
 
         {POLICY_STATE[policy.state].actions.length > 0 && (
           <Actions>
@@ -215,9 +225,9 @@ class Dashboard extends Component {
                 key={i}
                 action={action.method}
                 label={action.label}
-                intent={action.intent}
+                intent={action.intent || 'success'}
                 request={this.props.request}
-                withDetails={action.withDetails}
+                withDetails={action.withDetails || false}
                 id={policy.policyId}
                 updateAfterTransaction={this.updateAfterTransaction}
               />
@@ -229,11 +239,18 @@ class Dashboard extends Component {
 
     const claims = this.state.claims.map((claim, i) => (
       <Item key={i}>
-        <div><b>Claim Id: {claim.claimId}</b></div>
-        <div>Policy Id: {claim.policyId}</div>
-        <div>State: {CLAIM_STATE[claim.state].label}</div>
-        <div>State message: {hex2a(claim.stateMessage)}</div>
-        <div>Last update: {moment.unix(claim.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}</div>
+        <div>
+          <b>Claim Id: {claim.claimId}
+          </b>
+        </div>
+        <div>Policy Id: {claim.policyId}
+        </div>
+        <div>State: {CLAIM_STATE[claim.state].label}
+        </div>
+        <div>State message: {hex2a(claim.stateMessage)}
+        </div>
+        <div>Last update: {moment.unix(claim.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}
+        </div>
 
         {CLAIM_STATE[claim.state].actions.length > 0 && (
           <Actions>
@@ -242,9 +259,9 @@ class Dashboard extends Component {
                 key={i}
                 action={action.method}
                 label={action.label}
-                intent={action.intent}
+                intent={action.intent || 'success'}
                 request={this.props.request}
-                withDetails={action.withDetails}
+                withDetails={action.withDetails || false}
                 id={claim.claimId}
                 updateAfterTransaction={this.updateAfterTransaction}
               />
@@ -264,7 +281,7 @@ class Dashboard extends Component {
           <Title>Policies</Title>
 
           <List>
-            {this.state.loadingPolicies && <SpinnerWrapper><Spinner/></SpinnerWrapper>}
+            {this.state.loadingPolicies && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
             {!this.state.loadingPolicies && policies}
           </List>
         </Column>
@@ -272,7 +289,7 @@ class Dashboard extends Component {
         <Column>
           <Title>Claims</Title>
           <List>
-            {this.state.loadingClaims && <SpinnerWrapper><Spinner/></SpinnerWrapper>}
+            {this.state.loadingClaims && <SpinnerWrapper><Spinner /></SpinnerWrapper>}
             {!this.state.loadingPolicies && claims}
           </List>
         </Column>

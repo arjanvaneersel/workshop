@@ -17,6 +17,9 @@ const LoadingWrapper = styled.div`
   padding: 30px;
 `;
 
+/**
+ * Claim request page
+ */
 class Claim extends Component {
   state = {
     form: {
@@ -38,22 +41,26 @@ class Claim extends Component {
     this.setState({ form: { ...form, [field]: event.target.value } });
   };
 
+  /**
+   * Submit claim request form
+   * @param {event} e
+   */
   handleSubmit = (e) => {
+    const { form } = this.state;
+    const { request } = this.props;
+
     e.preventDefault();
 
     this.setState({ loading: true });
 
     const claim = {
-      policyId: this.state.form.policyId,
-      reason: this.state.form.reason,
+      policyId: form.policyId,
+      reason: form.reason,
     };
 
-    this.props.request('newClaim', claim)
+    request('newClaim', claim)
       .then((result) => {
-        console.log(result);
-
         if (result.data.error) {
-          console.log('1');
           this.setState({
             loading: false,
             result: {
@@ -61,7 +68,6 @@ class Claim extends Component {
             },
           });
         } else {
-          console.log('2');
           this.setState({
             loading: false,
             result: {
@@ -76,8 +82,10 @@ class Claim extends Component {
       .catch(console.error);
   };
 
+  newClaim = () => this.setState({ result: false });
+
   render() {
-    const { form } = this.state;
+    const { form, loading, result } = this.state;
     const { policyId, reason } = form;
 
 
@@ -88,7 +96,7 @@ class Claim extends Component {
         </Helmet>
         <h1>Claim</h1>
 
-        {!this.state.loading && !this.state.result && (
+        {!loading && !result && (
           <form onSubmit={this.handleSubmit}>
             <TextInputField
               label="Policy ID"
@@ -110,21 +118,25 @@ class Claim extends Component {
           </form>
         )}
 
-        {this.state.loading && !this.state.result && (
+        {loading && !result && (
           <LoadingWrapper>
             <Spinner />
           </LoadingWrapper>
         )}
 
-        {!this.state.loading && this.state.result && !this.state.result.error && (
+        {!loading && result && !result.error && (
           <div>
-            <h3>Claim #{this.state.result.claim.claimId} for policy #{this.state.result.claim.policyId} created</h3>
+            <h3>
+              Claim # {result.claim.claimId} for policy #{result.claim.policyId} created
+            </h3>
+            <Button appearance="primary" intent="success" onClick={this.newClaim}>Add new claim</Button>
           </div>
         )}
 
-        {!this.state.loading && this.state.result && this.state.result.error && (
+        {!loading && result && result.error && (
           <div>
-            <h3>An error has occured: {this.state.result.error}</h3>
+            <h3>An error has occured: {result.error}</h3>
+            <Button appearance="primary" intent="success" onClick={this.newClaim}>Add new claim</Button>
           </div>
         )}
       </Article>

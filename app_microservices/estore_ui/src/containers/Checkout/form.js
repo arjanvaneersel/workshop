@@ -80,7 +80,7 @@ class CardForm extends Component {
         />
 
         <CardDetails>
-          <CardElement style={{base: { fontSize: '16px' }}} hidePostalCode={true} />
+          <CardElement style={{ base: { fontSize: '16px' } }} hidePostalCode />
         </CardDetails>
 
         <Button appearance="primary" intent="success" type="submit" height={35}>Buy</Button>

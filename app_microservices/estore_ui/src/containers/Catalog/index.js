@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
@@ -51,41 +51,38 @@ const BuyBtn = styled.div`
   }
 `;
 
-class Catalog extends Component {
-  render() {
-    const items = products.map(item => (
-      <Product key={item.vendorCode}>
-        <h3>{item.product}</h3>
-        <img src={item.image} width="200" alt={item.product} />
+/**
+ * Catalog page
+ * @return {*}
+ * @constructor
+ */
+const Catalog = () => {
+  const items = products.map(item => (
+    <Product key={item.vendorCode}>
+      <h3>{item.product}</h3>
+      <img src={item.image} width="200" alt={item.product} />
 
-        <div>
-          Price:
-          {' '}
-          <b>{numeral(item.price).format('0,0.00')}</b>
-          {' '}
-          {item.currency}
-        </div>
+      <div>Price: <b>{numeral(item.price).format('0,0.00')}</b> {item.currency}</div>
 
-        <BuyBtn>
-          <Link to={`/checkout/${item.vendorCode}`}>Buy</Link>
-        </BuyBtn>
-      </Product>
-    ));
+      <BuyBtn>
+        <Link to={`/checkout/${item.vendorCode}`}>Buy</Link>
+      </BuyBtn>
+    </Product>
+  ));
 
-    return (
-      <Article>
-        <Helmet>
-          <title>Catalog</title>
-        </Helmet>
+  return (
+    <Article>
+      <Helmet>
+        <title>Catalog</title>
+      </Helmet>
 
-        <h1>Catalog</h1>
+      <h1>Catalog</h1>
 
-        <List>
-          {items}
-        </List>
-      </Article>
-    );
-  }
-}
+      <List>
+        {items}
+      </List>
+    </Article>
+  );
+};
 
 export default Catalog;

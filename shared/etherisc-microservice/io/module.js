@@ -17,7 +17,9 @@ module.exports = (config) => {
 
   const amqp = new Amqp(MESSAGE_BROKER || 'amqp://localhost:5672', appName, appVersion);
 
-  const genericInsurance = new GenericInsurance({ amqp, http, appName, appVersion });
+  const genericInsurance = new GenericInsurance({
+    amqp, http, appName, appVersion,
+  });
 
   return {
     amqp, db, http, log, appName, appVersion, config, genericInsurance,

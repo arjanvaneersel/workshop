@@ -35,31 +35,51 @@ const Page = styled.div`
   height: 100%;
 `;
 
-
+/**
+ * Root application component
+ */
 class Root extends Component {
   state = {
     logs: [],
   };
 
-  cleanLogs = () => this.setState({ logs: [] });
-
-  pushLog(msg) {
-    this.setState({ logs: [msg, ...this.state.logs]});
-  }
-
+  /**
+   * On component mounted livecycle hook
+   */
   componentDidMount() {
     this.openWs();
   }
 
-  openWs() {
+  /**
+   * Send a request by WebSocket
+   * @param {string} type
+   * @param {{}} data
+   * @return {*}
+   */
+  request = (type, data) => {
+    if (!window.socket) {
+      return Promise.reject();
+    }
+
+    return window.socket.sendRequest({ type, data }, { requestId: window.socket.getUniqueID() });
+  };
+
+  /**
+   * Create WebSocket connection
+   */
+  openWs = () => {
     const wsp = new WebSocketAsPromised(`${window.location.origin.replace(/^http/, 'ws')}/api/ws`, {
       packMessage: data => JSON.stringify(data),
       unpackMessage: message => JSON.parse(message),
-      attachRequestId: (data, requestId) => Object.assign({id: requestId}, data),
+      attachRequestId: (data, requestId) => Object.assign({ id: requestId }, data),
       extractRequestId: data => data && data.id,
     });
 
     wsp.getUniqueID = () => {
+      /**
+       * Generate unique id for query
+       * @return {string}
+       */
       const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 
       return `${s4()}${s4()}-${s4()}`;
@@ -73,21 +93,28 @@ class Root extends Component {
 
     wsp.onError.addListener(console.error);
     wsp.onClose.addListener(() => this.pushLog(JSON.stringify({ app: 'UI', msg: 'WS connection closed' })));
-    wsp.onMessage.addListener(msg => {
+    wsp.onMessage.addListener((msg) => {
       console.log(msg);
       this.pushLog(msg);
     });
-  }
-
-  request = (type, data) => {
-    if (!window.socket) {
-      return Promise.reject();
-    }
-
-    return window.socket.sendRequest({ type, data }, {requestId: window.socket.getUniqueID()});
   };
 
+  /**
+   * Add log message to the list
+   * @param {string} msg
+   */
+  pushLog = (msg) => {
+    const { logs } = this.state;
+    this.setState({ logs: [msg, ...logs] });
+  };
+
+  /**
+   * Render component
+   * @return {*}
+   */
   render() {
+    const { logs } = this.state;
+
     return (
       <Router>
         <Layout>
@@ -113,7 +140,7 @@ class Root extends Component {
             </Page>
           </Content>
 
-          <Console logs={this.state.logs} />
+          <Console logs={logs} />
         </Layout>
       </Router>
     );
