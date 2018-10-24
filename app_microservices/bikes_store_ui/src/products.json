@@ -1,0 +1,26 @@
+[
+  {
+    "vendorCode": "66555",
+    "product": "Trek Marlin 5 - 2018",
+    "details": "Wheel Size: 27.5-inch. Ride the fastest wheel that fits with Smart Wheel Size.",
+    "image": "/assets/trek-marlin-5-2018.jpg",
+    "price": "450",
+    "currency": "EUR"
+  },
+  {
+    "vendorCode": "277717",
+    "product": "Raleigh Electric Superbe",
+    "details": "Currie Electro-Drive Hub Motor System, 350W. 48V Lithium-ion, 8.7Ah, 418Wh",
+    "image": "/assets/raleigh-electric-superbe-ie-step-thru-2018.jpg",
+    "price": "1500",
+    "currency": "EUR"
+  },
+  {
+    "vendorCode": "221607",
+    "product": "Electra Loft 7D - Ladies'",
+    "details": "This modern day classic is built to ride. It’s lightweight. It’s durable. It’s comfortable.",
+    "image": "/assets/electra-loft-7d.jpg",
+    "price": "500",
+    "currency": "EUR"
+  }
+]

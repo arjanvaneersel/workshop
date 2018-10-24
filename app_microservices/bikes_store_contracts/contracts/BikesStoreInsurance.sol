@@ -4,7 +4,7 @@ pragma solidity 0.4.25;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-contract EStoreInsurance is Ownable {
+contract BikesStoreInsurance is Ownable {
 
     // Policy livecycle states
     enum PolicyState { Applied, Accepted, ForPayout, PaidOut, Expired, Declined }
@@ -150,17 +150,18 @@ contract EStoreInsurance is Ownable {
         _setClaimState(_claimId, ClaimState.Rejected, _reason);
     }
 
-    function confirmClaim(uint256 _claimId, string _reason) external onlyOwner {
+    function confirmClaim(uint256 _claimId, uint256 _sum, string _reason) external onlyOwner {
         Claim storage claim = claims[_claimId];
         Policy storage policy = policies[claim.policyId];
         Risk storage risk = risks[policy.riskId];
 
         require(policy.state == PolicyState.Accepted);
         require(claim.state == ClaimState.Applied);
+        require(risk.sumInsured >= _sum);
 
         _setClaimState(_claimId, ClaimState.Confirmed, _reason);
 
-        policy.expectedPayout = risk.sumInsured;
+        policy.expectedPayout = _sum;
 
         _setPolicyState(claim.policyId, PolicyState.ForPayout, "Claim is confirmed");
     }
@@ -169,7 +170,7 @@ contract EStoreInsurance is Ownable {
         Policy storage policy = policies[_policyId];
         require(policy.state == PolicyState.ForPayout);
 
-        _setPolicyState(_policyId, PolicyState.PaidOut, _proof);
+        _setPolicyState(_policyId, PolicyState.Accepted, _proof);
 
         policy.actualPayout = policy.expectedPayout;
         policy.expectedPayout = 0;

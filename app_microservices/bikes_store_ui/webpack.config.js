@@ -121,7 +121,7 @@ const config = {
   target: 'web',
 
   devServer: {
-    port: 8080,
+    port: 8081,
     publicPath: '/',
     historyApiFallback: true,
     stats: {
@@ -136,7 +136,7 @@ const config = {
     },
     proxy: {
       '/api/ws': {
-        target: 'ws://localhost:3010',
+        target: 'ws://localhost:3011',
         logLevel: 'debug',
         ws: true,
       },
