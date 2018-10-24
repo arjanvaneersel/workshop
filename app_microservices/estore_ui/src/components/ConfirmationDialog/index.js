@@ -66,11 +66,13 @@ class ConfirmationDialog extends Component {
           onConfirm={this.confirm}
           confirmLabel={isLoading ? 'Loading...' : label}
         >
-          <p>Are you sure you want to confirm this transaction?</p>
+          {!withDetails && (
+            <p>Are you sure you want to confirm this transaction?</p>
+          )}
 
           {withDetails && (
             <div>
-              <p>If so, please specify the details:</p>
+              <p>Are you sure you want to confirm this transaction? If so, please specify the details:</p>
               <TextInput
                 placeholder="Details"
                 width="100%"
