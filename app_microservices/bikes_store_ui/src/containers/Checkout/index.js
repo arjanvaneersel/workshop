@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
-import { Spinner } from 'evergreen-ui';
 import { StripeProvider, Elements } from 'react-stripe-elements';
 import products from 'products.json';
 import numeral from 'numeral';
@@ -137,7 +136,6 @@ class Checkout extends Component {
         {!loading && !purchase && (
           <CheckoutForm>
             <h3>Checkout</h3>
-
             <p>3 years insurance included.</p>
 
             <h4>Total: {numeral(product.price).format('0,0.00')} {product.currency}</h4>
@@ -153,7 +151,7 @@ class Checkout extends Component {
 
         {loading && !purchase && (
           <Purchase>
-            <Spinner />
+            <img src="/assets/preloader.gif" alt="Preloader" />
           </Purchase>
         )}
 

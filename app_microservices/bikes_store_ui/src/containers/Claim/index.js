@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
-import { TextInputField, Button, Spinner } from 'evergreen-ui';
+import { TextInputField, Button } from 'evergreen-ui';
 
 
 const Article = styled.article`
@@ -129,7 +129,7 @@ class Claim extends Component {
 
         {loading && !result && (
           <LoadingWrapper>
-            <Spinner />
+            <img src="/assets/preloader.gif" alt="Preloader" />
           </LoadingWrapper>
         )}
 
