@@ -163,7 +163,7 @@ contract EStoreInsurance is Ownable {
 
         policy.expectedPayout = risk.sumInsured;
 
-        _setPolicyState(claim.policyId, PolicyState.ForPayout, "Claim confirmed");
+        _setPolicyState(claim.policyId, PolicyState.ForPayout, "Claim is confirmed");
     }
 
     function confirmPayout(uint256 _policyId, bytes32 _proof) external onlyOwner {

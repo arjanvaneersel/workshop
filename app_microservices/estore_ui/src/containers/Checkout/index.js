@@ -230,8 +230,8 @@ class Checkout extends Component {
 
           {purchase.policy && (
           <div>
-            <p><b>Policy:</b></p>
-            <p>Id: {purchase.policy.id}</p>
+            <p><b>Policy ID:</b></p>
+            <p>{purchase.policy.id}</p>
             <p>
               <a href={`https://kovan.etherscan.io/tx/${purchase.policy.transactionHash}`} target="_blank" rel="noopener noreferrer">
                 Transaction
