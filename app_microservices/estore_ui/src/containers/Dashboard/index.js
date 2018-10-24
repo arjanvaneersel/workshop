@@ -172,16 +172,11 @@ class Dashboard extends Component {
     const policiesList = policies.map(policy => (
       <Item key={policy.policyId}>
         <div><b>{hex2a(policy.product)}</b></div>
-        <div>Policy ID: {policy.policyId}
-        </div>
-        <div>State: {POLICY_STATE[policy.state].label}
-        </div>
-        <div>State message: {hex2a(policy.stateMessage)}
-        </div>
-        <div>Last update: {moment.unix(policy.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}
-        </div>
-        <div>Premium: {numeral(policy.premium / 100).format('0,0.00')}
-        </div>
+        <div>Policy ID: {policy.policyId}</div>
+        <div>State: {POLICY_STATE[policy.state].label}</div>
+        <div>State message: {hex2a(policy.stateMessage)}</div>
+        <div>Last update: {moment.unix(policy.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')} UTC</div>
+        <div>Premium: {numeral(policy.premium / 100).format('0,0.00')}</div>
 
         {POLICY_STATE[policy.state].actions.length > 0 && (
           <Actions>
@@ -205,17 +200,12 @@ class Dashboard extends Component {
     const claimsList = claims.map(claim => (
       <Item key={claim.claimId}>
         <div>
-          <b>Claim ID: {claim.claimId}
-          </b>
+          <b>Claim ID: {claim.claimId}</b>
         </div>
-        <div>Policy ID: {claim.policyId}
-        </div>
-        <div>State: {CLAIM_STATE[claim.state].label}
-        </div>
-        <div>State message: {hex2a(claim.stateMessage)}
-        </div>
-        <div>Last update: {moment.unix(claim.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')}
-        </div>
+        <div>Policy ID: {claim.policyId}</div>
+        <div>State: {CLAIM_STATE[claim.state].label}</div>
+        <div>State message: {hex2a(claim.stateMessage)}</div>
+        <div>Last update: {moment.unix(claim.stateTime).utc().format('YYYY-MM-DD HH:mm:ss')} UTC</div>
 
         {CLAIM_STATE[claim.state].actions.length > 0 && (
           <Actions>
