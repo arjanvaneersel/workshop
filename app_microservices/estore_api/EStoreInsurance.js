@@ -117,19 +117,26 @@ class EStoreInsurance {
   newPolicy(client, message) {
     this.log.info('newPolicy', message);
 
-    this.contract.methods.newPolicy(
-      web3.utils.asciiToHex(message.data.policy.vendorCode),
-      web3.utils.asciiToHex(message.data.policy.product),
-      message.data.policy.premium,
-      message.data.policy.sumInsured,
-      CURRENCIES[message.data.policy.currency],
-      EXPIRATIONS[message.data.policy.expiration](),
-      web3.utils.asciiToHex(message.id),
-    )
-      .send()
-      .then((data) => {
-        this.gi.sendWs(client, { id: message.id, data });
-      });
+    try {
+      this.contract.methods.newPolicy(
+        web3.utils.asciiToHex(message.data.policy.vendorCode),
+        web3.utils.asciiToHex(message.data.policy.product),
+        message.data.policy.premium,
+        message.data.policy.sumInsured,
+        CURRENCIES[message.data.policy.currency],
+        EXPIRATIONS[message.data.policy.expiration](),
+        web3.utils.asciiToHex(message.id),
+      )
+        .send()
+        .then(data => this.gi.sendWs(client, { id: message.id, data }))
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
+    } catch (e) {
+      this.log.error(e);
+      this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+    }
   }
 
   /**
@@ -140,19 +147,27 @@ class EStoreInsurance {
   async underwrite(client, message) {
     this.log.info('underwrite', message);
 
-    await this.contract.methods.underwrite(
-      message.data.id,
-    ).send();
+    try {
+      await this.contract.methods.underwrite(message.data.id)
+        .send()
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
 
-    const policy = await this.contract.methods.policies(message.data.id).call();
-    const risk = await this.contract.methods.risks(policy.riskId).call();
+      const policy = await this.contract.methods.policies(message.data.id).call();
+      const risk = await this.contract.methods.risks(policy.riskId).call();
 
-    this.gi.sendWs(client, {
-      id: message.id,
-      data: {
-        policy: { policyId: message.data.id, ...policy, ...risk },
-      },
-    });
+      this.gi.sendWs(client, {
+        id: message.id,
+        data: {
+          policy: { policyId: message.data.id, ...policy, ...risk },
+        },
+      });
+    } catch (e) {
+      this.log.error(e);
+      this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+    }
   }
 
   /**
@@ -163,20 +178,30 @@ class EStoreInsurance {
   async decline(client, message) {
     this.log.info('decline', message);
 
-    await this.contract.methods.decline(
-      message.data.id,
-      web3.utils.asciiToHex(message.data.details),
-    ).send();
+    try {
+      await this.contract.methods.decline(
+        message.data.id,
+        web3.utils.asciiToHex(message.data.details),
+      )
+        .send()
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
 
-    const policy = await this.contract.methods.policies(message.data.id).call();
-    const risk = await this.contract.methods.risks(policy.riskId).call();
+      const policy = await this.contract.methods.policies(message.data.id).call();
+      const risk = await this.contract.methods.risks(policy.riskId).call();
 
-    this.gi.sendWs(client, {
-      id: message.id,
-      data: {
-        policy: { policyId: message.data.id, ...policy, ...risk },
-      },
-    });
+      this.gi.sendWs(client, {
+        id: message.id,
+        data: {
+          policy: { policyId: message.data.id, ...policy, ...risk },
+        },
+      });
+    } catch (e) {
+      this.log.error(e);
+      this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+    }
   }
 
   /**
@@ -193,17 +218,13 @@ class EStoreInsurance {
         web3.utils.asciiToHex(message.data.reason),
       )
         .send()
-        .then((data) => {
-          this.gi.sendWs(client, { id: message.id, data });
-        })
+        .then(data => this.gi.sendWs(client, { id: message.id, data }))
         .catch((e) => {
-          console.error(e);
-
+          this.log.error(e);
           this.gi.sendWs(client, { id: message.id, data: { error: 'Transaction failed' } });
         });
     } catch (e) {
-      console.error(e);
-
+      this.log.error(e);
       this.gi.sendWs(client, { id: message.id, data: { error: 'Invalid arguments for transaction' } });
     }
   }
@@ -217,9 +238,12 @@ class EStoreInsurance {
     this.log.info('expire', message);
 
     try {
-      await this.contract.methods.expire(
-        message.data.id,
-      ).send();
+      await this.contract.methods.expire(message.data.id)
+        .send()
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
 
       const policy = await this.contract.methods.policies(message.data.id).call();
       const risk = await this.contract.methods.risks(policy.riskId).call();
@@ -231,8 +255,7 @@ class EStoreInsurance {
         },
       });
     } catch (e) {
-      console.error(e);
-
+      this.log.error(e);
       this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
     }
   }
@@ -246,13 +269,15 @@ class EStoreInsurance {
     this.log.info('rejectClaim', message);
 
     try {
-      console.log('1');
       await this.contract.methods.rejectClaim(
         message.data.id,
         web3.utils.asciiToHex(message.data.details),
       )
         .send()
-        .catch(console.error);
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
 
       const claim = await this.contract.methods.claims(message.data.id).call();
       const policy = await this.contract.methods.policies(claim.policyId).call();
@@ -266,8 +291,7 @@ class EStoreInsurance {
         },
       });
     } catch (e) {
-      console.error(e);
-
+      this.log.error(e);
       this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
     }
   }
@@ -280,22 +304,32 @@ class EStoreInsurance {
   async confirmClaim(client, message) {
     this.log.info('confirmClaim', message);
 
-    await this.contract.methods.confirmClaim(
-      message.data.id,
-      web3.utils.asciiToHex(message.data.details),
-    ).send();
+    try {
+      await this.contract.methods.confirmClaim(
+        message.data.id,
+        web3.utils.asciiToHex(message.data.details),
+      )
+        .send()
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
 
-    const claim = await this.contract.methods.claims(message.data.id).call();
-    const policy = await this.contract.methods.policies(claim.policyId).call();
-    const risk = await this.contract.methods.risks(policy.riskId).call();
+      const claim = await this.contract.methods.claims(message.data.id).call();
+      const policy = await this.contract.methods.policies(claim.policyId).call();
+      const risk = await this.contract.methods.risks(policy.riskId).call();
 
-    this.gi.sendWs(client, {
-      id: message.id,
-      data: {
-        policy: { policyId: claim.policyId, ...policy, ...risk },
-        claim: { claimId: message.data.id, ...claim },
-      },
-    });
+      this.gi.sendWs(client, {
+        id: message.id,
+        data: {
+          policy: { policyId: claim.policyId, ...policy, ...risk },
+          claim: { claimId: message.data.id, ...claim },
+        },
+      });
+    } catch (e) {
+      this.log.error(e);
+      this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+    }
   }
 
   /**
@@ -306,20 +340,30 @@ class EStoreInsurance {
   async confirmPayout(client, message) {
     this.log.info('confirmPayout', message);
 
-    await this.contract.methods.confirmPayout(
-      message.data.id,
-      web3.utils.asciiToHex(message.data.details),
-    ).send();
+    try {
+      await this.contract.methods.confirmPayout(
+        message.data.id,
+        web3.utils.asciiToHex(message.data.details),
+      )
+        .send()
+        .catch((e) => {
+          this.log.error(e);
+          this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+        });
 
-    const policy = await this.contract.methods.policies(message.data.id).call();
-    const risk = await this.contract.methods.risks(policy.riskId).call();
+      const policy = await this.contract.methods.policies(message.data.id).call();
+      const risk = await this.contract.methods.risks(policy.riskId).call();
 
-    this.gi.sendWs(client, {
-      id: message.id,
-      data: {
-        policy: { policyId: message.data.id, ...policy, ...risk },
-      },
-    });
+      this.gi.sendWs(client, {
+        id: message.id,
+        data: {
+          policy: { policyId: message.data.id, ...policy, ...risk },
+        },
+      });
+    } catch (e) {
+      this.log.error(e);
+      this.gi.sendWs(client, { id: message.id, data: { error: e.message } });
+    }
   }
 
   /**
