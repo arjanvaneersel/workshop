@@ -121,6 +121,8 @@ const config = {
   target: 'web',
 
   devServer: {
+    host: '0.0.0.0',
+    disableHostCheck: true,
     port: 8080,
     publicPath: '/',
     historyApiFallback: true,
