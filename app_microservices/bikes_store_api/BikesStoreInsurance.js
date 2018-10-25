@@ -5,7 +5,7 @@ const ABI = require('./BikesStoreInsurance.json');
 
 
 const MNEMONIC = 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treatment';
-const CONTRACT = '0xa9E96ca20650F3B6abD61abB451BAE0Ff494792c';
+const CONTRACT = '0x4AFBAc31d1DC6F275a6aA32cBa80Ae7115041c33';
 const ACCOUNT = '0x1b7eeb70b214a41e19fc8ba66fb291b9b097ecaf';
 const HTTP_PROVIDER = 'https://kovan.infura.io/1reQ7FJQ1zs0QGExhlZ8';
 const WS_PROVIDER = 'wss://kovan.infura.io/ws';
@@ -329,9 +329,14 @@ class BikesStoreInsurance {
     this.log.info('confirmClaim', message);
 
     try {
+      const policyBefore = await this.contract.methods.policies(message.data.id).call();
+      const riskBefore = await this.contract.methods.risks(policyBefore.riskId).call();
+
+      const amount = riskBefore.sumInsured * message.compensation / 100;
+
       await this.contract.methods.confirmClaim(
         message.data.id,
-        message.data.compensation,
+        amount,
         web3.utils.asciiToHex(message.data.details),
       )
         .send()
@@ -366,14 +371,8 @@ class BikesStoreInsurance {
     this.log.info('confirmPayout', message);
 
     try {
-      const policyBefore = await this.contract.methods.policies(message.data.id).call();
-      const riskBefore = await this.contract.methods.risks(policyBefore.riskId).call();
-
-      const amount = riskBefore.sumInsured * message.compensation / 100;
-
       await this.contract.methods.confirmPayout(
         message.data.id,
-        amount,
         web3.utils.asciiToHex(message.data.details),
       )
         .send()
